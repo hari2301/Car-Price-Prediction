@@ -1,0 +1,312 @@
+<html>
+    <style>
+        .main-container {
+            width:100%;
+            display: flex;
+            flex-direction: row;
+            position: absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom: 0;
+        }
+        .sub-container-1{
+            width: 50%;
+            height: 100%;
+        }
+        .sub-container-1 img{
+            width: 100%;
+            height: 100%;
+        }
+        .sub-container-2{
+            width: 50%;
+            height: 100%;
+        }
+        .form-box {
+            display: flex;
+            flex-direction: column;
+            margin-top: 10%;
+            align-items: center;
+        }
+        .form-box label {
+            font-size: 15px;
+            text-transform: uppercase;
+            color: #000;
+            font-weight: bold;
+        }
+        .form-box input {
+            border: 1px solid #d5d5d5;
+            height: 40px;
+            width: 50vh;
+            padding: 0px 10px;
+            font-size: 20px;
+        }
+        .form-box input:focus {
+            outline: none;
+        }
+        .form-box input[type="submit"],.form-box input[type="reset"] {
+            background-color: #000;   
+            text-transform: uppercase;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+            font-size: 15px;
+            height: 44px;
+        }
+        .form-box input[type="submit"]:hover,.form-box input[type="reset"]:hover {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+        .form-box span {
+            font-size: 20px;
+            text-transform: uppercase;
+            color: #000;
+            font-weight: bold;
+        }
+        .open-close-box, .duration, .buttons {
+            display: flex;
+            flex-direction: column;
+        }
+        .extra-space {
+            height: 10px;
+        }
+        .search_categories:focus {
+            outline: none;
+        }
+        .search_categories{
+            font-size: 13px;
+            padding: 8px 8px 8px 14px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 42px;
+            }
+
+            .search_categories .select{
+                width: 100vh;
+            background:url('arrow.png') no-repeat;
+            background-position:70% center;
+            }
+
+            .search_categories .select select{
+            background: transparent;
+            line-height: 1;
+            border: 0;
+            padding: 0;
+            border-radius: 0;
+            width: 100vh;
+            position: relative;
+            z-index: 10;
+            font-size: 1em;
+            height:40px;
+            }
+            #year:focus{
+                border: 1px solid #d5d5d5;
+                color: #000;
+            }
+            .result span{
+                color: green;
+                font-size: 25px;
+            }
+            .element span{
+                font-size: 15px;
+            }
+    </style>
+    <body onload="loaded();">
+        <div class="main-container">
+            <div class="sub-container-1">
+                <img id="ele-image" src="https://i.pinimg.com/originals/61/b0/0c/61b00c7a335b7455c93a378dee062c0d.jpg"/>
+            </div>
+            <div class="sub-container-2">
+                <div class="form-box">
+                    <form id="main-form" action="{{url_for('predict')}}" method="post" onsubmit="return validateForm()">
+                        <span class="title" style="font-size: 30px;color:dodgerblue;">Car Price</span>
+                        <div class="extra-space"></div>
+
+                        <div class="element">
+                            <span>Fuel Type </span>
+                            <select  id="ele" class="search_categories" name="Fuel_Type_Petrol">
+                                <option value="1">pertol</option>
+                                <option value="2">diesel</option>
+                                <option value="3">CNG</option>
+                            </select>
+                        </div>
+
+                        <div class="extra-space"></div>
+                        <div class="element">
+                            <span>Seller Type </span>
+                            <select  id="ele" class="search_categories" name="Seller_Type_Individual">
+                                <option value="1">Dealer</option>
+                                <option value="2">Individual</option>
+                            </select>
+                        </div>
+
+                        <div class="extra-space"></div>
+                        <div class="element">
+                            <span>Transmission</span>
+                            <select  id="ele" class="search_categories" name="Transmission_Mannual">
+                                <option value="1">Manual</option>
+                                <option value="2">Automatic</option>
+                            </select>
+                        </div>
+
+                        <div class="extra-space"></div>
+                        <div class="open-close-box">
+                            <label>Present_Price(in lakhs)</label>
+                            <input name="Present_Price" id="open" type="tel" id="open-price"/>
+                            <div class="extra-space"></div>
+                            <label>KMS driven</label>
+                            <input name="Kms_Driven" id="close" type="tel" id="close-price"/>
+                        </div>
+
+                        <div class="extra-space"></div>
+                        <div class="duration">
+                            <label>Owner</label>
+                            <input  name="Owner" id="year" type="number" id="year"/>
+                            <div class="extra-space"></div>
+                            <label>Total Years</label>
+                            <input name="Year" id="month" type="number" id="month"/>
+                            <div class="extra-space"></div>
+                        </div>
+                        <div class="extra-space"></div>
+                        <div class="extra-space"></div>
+                        <div class="buttons">
+                            <input type="submit" value="SUBMIT"/>
+                            <div class="extra-space"></div>
+                            <input type="reset" value="RESET"/>
+                        </div>
+                    </form>    
+                    {%if prediction_text%} 
+                    <div class="result">
+                        <span id="result">{{prediction_text}}</span>
+                    </div>    
+                    {%endif%}            
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function toggleimage() {
+            let ele = document.getElementById("ele")
+            let ele_image = document.getElementById("ele-image")
+            if (ele.value === "1") {
+                ele_image.src= "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxSLLpO6tVY2kL_rXCv3EzVfyEHpEokGPpkF6GE49BAgqLlWjclojNFQq-e2uDs9_ETNo&usqp=CAU"
+            } else if(ele.value === "2") {
+                ele_image.src = "https://economictimes.indiatimes.com/thumb/height-450,width-800,msid-71000630,imgsize-141865/untitled-10.jpg"
+            } else if(ele.value === "0") {
+                ele_image.src = "https://agmetalminer.com/mmwp/wp-content/uploads/2021/01/ShawnHempel_AdobeStock_copperbars_012621.jpg"
+            } else {
+                ele_image.src= "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxSLLpO6tVY2kL_rXCv3EzVfyEHpEokGPpkF6GE49BAgqLlWjclojNFQq-e2uDs9_ETNo&usqp=CAU"
+            }
+        }
+        function validate(event) {
+            let flag = 1;
+            let year = document.getElementById("year").value
+            if (parseInt(year) !== "NaN") {
+                if (year.length > 4 || year.length < 4) {
+                    document.getElementById("year").style.color ="red"
+                    document.getElementById("year").style.border = "1px solid red";
+                    flag = 0;
+                }
+            } else {
+                document.getElementById("year").style.color ="red"
+                document.getElementById("year").style.border = "1px solid red";
+                flag = 0;
+            }
+            
+            let month = document.getElementById("month").value
+            if (parseInt(month) !== "NaN") {
+                if (!(parseInt(month) > 0 && parseInt(month) < 13)) {
+                    document.getElementById("month").style.color ="red"
+                    document.getElementById("month").style.border = "1px solid red";
+                    flag = 0;
+                }
+            } else {
+                document.getElementById("month").style.color ="red"
+                document.getElementById("month").style.border = "1px solid red";
+                flag = 0;
+            }
+
+            let date = document.getElementById("date").value
+            if (parseInt(date) !== "NaN") {
+                if (!(parseInt(date) > 0 && parseInt(date) < 32)) {
+                    document.getElementById("date").style.color ="red"
+                    document.getElementById("date").style.border = "1px solid red";
+                    flag = 0;
+                }
+            } else {
+                document.getElementById("date").style.color ="red"
+                document.getElementById("date").style.border = "1px solid red";
+                flag = 0;
+            }
+
+            let close = document.getElementById("close").value
+            if (Number.isNaN(parseInt(close))) {
+                document.getElementById("close").style.color ="red"
+                document.getElementById("close").style.border = "1px solid red";
+                flag = 0;
+            }
+
+            let open = document.getElementById("open").value
+            
+            if (Number.isNaN(parseInt(open))) {
+                console.log(open)
+                document.getElementById("open").style.color ="red"
+                document.getElementById("open").style.border = "1px solid red";
+                flag = 0;
+            }
+            if (flag) {
+                return true
+            } else {
+                return false;
+            }
+        }
+
+        function loaded() {
+            document.getElementById("year").addEventListener("click",() => {
+                document.getElementById("year").style.color ="#000"
+                document.getElementById("year").style.border = "1px solid #d5d5d5";
+            })
+            document.getElementById("month").addEventListener("click",() => {
+                document.getElementById("month").style.color ="#000"
+                document.getElementById("month").style.border = "1px solid #d5d5d5";
+            })
+            document.getElementById("date").addEventListener("click",() => {
+                document.getElementById("date").style.color ="#000"
+                document.getElementById("date").style.border = "1px solid #d5d5d5";
+            })
+            document.getElementById("open").addEventListener("click",() => {
+                document.getElementById("open").style.color ="#000"
+                document.getElementById("open").style.border = "1px solid #d5d5d5";
+            })
+            document.getElementById("close").addEventListener("click",() => {
+                document.getElementById("close").style.color ="#000"
+                document.getElementById("close").style.border = "1px solid #d5d5d5";
+            }) 
+            let ele_image = document.getElementById("ele-image")
+            let mat = window.location.search.split("=").pop()
+            console.log(mat)
+                
+                if ( mat === "1") {
+                    document.getElementById("ele").value = "1"
+                    ele_image.src= "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxSLLpO6tVY2kL_rXCv3EzVfyEHpEokGPpkF6GE49BAgqLlWjclojNFQq-e2uDs9_ETNo&usqp=CAU"
+                } else if(mat === "2") {
+                    document.getElementById("ele").value = "2"
+                    ele_image.src = "https://economictimes.indiatimes.com/thumb/height-450,width-800,msid-71000630,imgsize-141865/untitled-10.jpg"
+                } else if(mat === "0") {
+                    document.getElementById("ele").value = "0"
+                    ele_image.src = "https://agmetalminer.com/mmwp/wp-content/uploads/2021/01/ShawnHempel_AdobeStock_copperbars_012621.jpg"
+                } else {
+                    console.log("4")
+                    ele_image.src= "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxSLLpO6tVY2kL_rXCv3EzVfyEHpEokGPpkF6GE49BAgqLlWjclojNFQq-e2uDs9_ETNo&usqp=CAU"
+                }
+            
+        }
+    </script>
+</html>
